@@ -1,0 +1,18 @@
+# Eclipse
+.metadata/
+**/bin/
+**/target/
+
+# Visual Studio
+.vs/
+**/obj/
+*.user
+*.suo
+
+# Java / Gradle
+.gradle/
+**/build/
+
+# Sensitive files
+.env
+.env.*
