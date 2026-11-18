@@ -1,4 +1,4 @@
-namespace winforms
+namespace ProductionClient
 {
     internal static class Program
     {

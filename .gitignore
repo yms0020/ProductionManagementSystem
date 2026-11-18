@@ -4,13 +4,13 @@
 **/target/
 
 # Visual Studio
-.vs/
+**/.vs/
 **/obj/
-*.user
-*.suo
+*.user*
+*.suo*
 
 # Java / Gradle
-.gradle/
+**/.gradle/
 **/build/
 
 # Sensitive files
