@@ -44,8 +44,6 @@ C# WinForms Client
 - **DB Username** : Oracle 사용자 계정
 - **DB Password** : Oracle 사용자 비밀번호
 
-※ 실제 DB 계정과 비밀번호는 GitHub에 공개하지 않도록 주의하세요.
-
 ### 2. 테이블 생성
 
 Oracle DB에 접속한 후 다음 SQL을 실행하여 `PRODUCTION_RESULT` 테이블을 생성합니다.
