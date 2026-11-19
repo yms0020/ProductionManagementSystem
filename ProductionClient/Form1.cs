@@ -10,9 +10,13 @@ namespace ProductionClient
 {
     public partial class Form1 : Form
     {
+        private int previousResultId; // 셀 클릭 이전 ResultId 저장
         public Form1()
-        {
+        {   
             InitializeComponent();
+
+            dgvProduction.AutoGenerateColumns = false; //열 자동 생성 끄기
+
         }
 
         private void groupBox1_Enter(object sender, EventArgs e)
@@ -39,6 +43,12 @@ namespace ProductionClient
         {
             try
             {
+                if (!int.TryParse(txtResultId.Text.Trim(), out int resultId) || resultId <= 0)
+                {
+                    MessageBox.Show("실적 ID는 1 이상의 숫자로 입력하세요.");
+                    return;
+                }
+
                 string productCode = txtProductCode.Text.Trim(); //입력 박스에 데이터 추출
 
                 string productName = txtProductName.Text.Trim();
@@ -62,9 +72,9 @@ namespace ProductionClient
                 }
 
                 //생산 수량
-                if (quantity < 0)
+                if (quantity <= 0)
                 {
-                    MessageBox.Show("생산 수량은 0 이상의 숫자로 입력하세요");
+                    MessageBox.Show("생산 수량은 1 이상의 숫자로 입력하세요");
                     return;
                 }
 
@@ -78,6 +88,7 @@ namespace ProductionClient
                 //xml 생성
                 string xml = new XElement("Request",
                     new XElement("Action", "INSERT"),
+                    new XElement("ResultId", resultId),
                     new XElement("ProductCode", productCode),
                     new XElement("ProductName", productName),
                     new XElement("Quantity", quantity),
@@ -98,7 +109,9 @@ namespace ProductionClient
                 }
                 else
                 {
-                    throw new InvalidOperationException("등록을 실패했습니다.");
+                    string message = (string?)doc.Root?.Element("Message")
+                     ?? "데이터 변경 거부";
+                    throw new InvalidOperationException(message);
                 }
             }
             catch (Exception ex)
@@ -141,9 +154,9 @@ namespace ProductionClient
                 }
 
                 //생산 수량
-                if (quantity < 0)
+                if (quantity <= 0)
                 {
-                    MessageBox.Show("생산 수량은 0 이상의 숫자로 입력하세요");
+                    MessageBox.Show("생산 수량은 1 이상의 숫자로 입력하세요");
                     return;
                 }
 
@@ -157,6 +170,7 @@ namespace ProductionClient
                 //XML 생성
                 string xml = new XElement("Request",
                     new XElement("ResultId", resultId),
+                    new XElement("PreviousResultId", previousResultId),
                     new XElement("Action", "UPDATE"),
                     new XElement("ProductCode", productCode),
                     new XElement("ProductName", productName),
@@ -175,13 +189,16 @@ namespace ProductionClient
 
                 if (success == "true")
                 {
+                    MessageBox.Show(xml);
                     MessageBox.Show("데이터 변경 확인");
                     RefreshProductionGrid();
                     ClearInputs();
                 }
                 else
                 {
-                    throw new InvalidOperationException("데이터 변경 거부");
+                    string message = (string?)doc.Root?.Element("Message")
+                     ?? "데이터 변경 거부";
+                    throw new InvalidOperationException(message);
                 }
             }
             catch (Exception ex)
@@ -202,7 +219,7 @@ namespace ProductionClient
                     return;
                 }
 
-                DialogResult result = MessageBox.Show("정말 삭제하시겠습니까?","삭제 확인",
+                DialogResult result = MessageBox.Show("정말 삭제하시겠습니까?", "삭제 확인",
                 MessageBoxButtons.YesNo,
                 MessageBoxIcon.Warning);
 
@@ -228,7 +245,7 @@ namespace ProductionClient
 
                 if (success == "true")
                 {
-                    MessageBox.Show("데이터가 삭제되었습니다.","삭제 완료", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBox.Show("데이터가 삭제되었습니다.", "삭제 완료", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     ClearInputs();
                     RefreshProductionGrid();
                 }
@@ -250,6 +267,7 @@ namespace ProductionClient
 
         private void Form1_Load(object sender, EventArgs e)
         {
+
         }
 
         private string sendRequest(string xml)
@@ -258,8 +276,8 @@ namespace ProductionClient
 
             using NetworkStream stream = tcpClient.GetStream(); //연결된 서버의 데이터 교환 통로
 
-            stream.ReadTimeout = 10000; //응답 시간제한 10초
-            stream.WriteTimeout = 10000; //요청 시간제한 10초
+            stream.ReadTimeout = 100000; //응답 시간제한 10초
+            stream.WriteTimeout = 100000; //요청 시간제한 10초
 
             byte[] data = Encoding.UTF8.GetBytes(xml); //tcp는 바이트로 통신하므로 문자열을 바이트로 변환을 해야한다.
 
@@ -364,17 +382,7 @@ namespace ProductionClient
         {
             List<ProductionDTO> list = LoadProductionData();
 
-            dgvProduction.AutoGenerateColumns = true; //열 자동 생성
-
-            dgvProduction.DataSource = list; //그리드 데이터 장착
-
-
-            //컬럼 제목 변경
-            dgvProduction.Columns["ResultId"]!.HeaderText = "실적 ID";
-            dgvProduction.Columns["ProductCode"]!.HeaderText = "제품 코드";
-            dgvProduction.Columns["ProductName"]!.HeaderText = "제품명";
-            dgvProduction.Columns["Quantity"]!.HeaderText = "생산 수량";
-            dgvProduction.Columns["Status"]!.HeaderText = "상태";
+            dgvProduction.DataSource = list; //그리드 데이터 
 
         }
 
@@ -394,10 +402,16 @@ namespace ProductionClient
             //row.Cells["ProductName"] → ProductName이라는 이름의 열
 
             txtResultId.Text = row.Cells[0].Value?.ToString() ?? "";
+            previousResultId = int.Parse(row.Cells[0].Value?.ToString() ?? "");
             txtProductCode.Text = row.Cells[1].Value?.ToString() ?? "";
             txtProductName.Text = row.Cells[2].Value?.ToString() ?? "";
             txtQuantity.Text = row.Cells[3].Value?.ToString() ?? "";
             cmbStatus.Text = row.Cells[4].Value?.ToString() ?? "";
+
+        }
+
+        private void dgvProduction_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
 
         }
     }

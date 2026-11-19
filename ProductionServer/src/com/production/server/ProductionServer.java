@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
+import java.sql.SQLException;
 import java.util.List;
 
 import org.w3c.dom.Document;
@@ -37,7 +38,7 @@ public class ProductionServer {
 
                     System.out.println("클라이언트 연결 성공!");
 
-                    client.setSoTimeout(10000);
+                    client.setSoTimeout(100000);
 
                     DataInputStream in =
                             new DataInputStream(client.getInputStream());
@@ -69,17 +70,26 @@ public class ProductionServer {
                         sendResponse(out, response);
 
                     } catch (Exception e) {
-
+                    	
                         System.err.println(
                                 "요청 처리 오류: " + e.getMessage()
                         );
+                        
+                        String message = "요청 처리 실패";
+                        
+                        if (e instanceof SQLException sqlEx) {
+
+                            if (sqlEx.getErrorCode() == 1) {
+                                message = "이미 존재하는 ResultId입니다.";
+                            }
+                        }
 
                         try {
                             sendResponse(
                                     out,
                                     "<Response>"
                                     + "<Success>false</Success>"
-                                    + "<Message>요청 처리 실패</Message>"
+                                    + "<Message>" + message + "</Message>"
                                     + "</Response>"
                             );
 
@@ -166,16 +176,12 @@ public class ProductionServer {
 
             case "UPDATE": {
 
-                int resultId =
-                        parser.getInt(document, "ResultId");
+            	 ProductionUpdateRequest request =
+            	            parser.parseUpdate(document);
 
-                ProductionUpdateRequest request =
-                        parser.parseUpdate(document);
+            	    int result = service.update(request);
 
-                int result =
-                        service.update(resultId, request);
-
-                return resultResponse(result);
+            	    return resultResponse(result);
             }
 
             case "DELETE": {

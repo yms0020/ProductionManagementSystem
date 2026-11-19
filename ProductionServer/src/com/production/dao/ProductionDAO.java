@@ -14,7 +14,7 @@ public class ProductionDAO {
 	
 	public List<ProductionVO> findAll() throws SQLException {
 		
-		String sql = "SELECT * FROM PRODUCTION_RESULT";
+		String sql = "SELECT * FROM PRODUCTION_RESULT1";
 
 		List<ProductionVO> list = new ArrayList<>();
 		
@@ -42,27 +42,31 @@ public class ProductionDAO {
 	
 	public int insert(ProductionVO vo) throws SQLException {
 		
-		String sql = "INSERT INTO PRODUCTION_RESULT "
-					+ "(PRODUCT_CODE,PRODUCT_NAME,QUANTITY,STATUS) "
-					+ "VALUES (?,?,?,?)";
+		String sql = "INSERT INTO PRODUCTION_RESULT1 "
+		           + "(RESULT_ID,PRODUCT_CODE,PRODUCT_NAME,QUANTITY,STATUS) "
+		           + "VALUES (?,?,?,?,?)";
 		
 		try(Connection conn = DBUtil.getConnection();
 							  PreparedStatement pstmt = conn.prepareStatement(sql)) {
 			
-			pstmt.setString(1,vo.getProductCode());
-			pstmt.setString(2,vo.getProductName());
-			pstmt.setInt(3, vo.getQuantity());
-			pstmt.setString(4,vo.getStatus());
+			
+			pstmt.setInt(1, vo.getResultId());
+			pstmt.setString(2, vo.getProductCode());
+			pstmt.setString(3, vo.getProductName());
+			pstmt.setInt(4, vo.getQuantity());
+			pstmt.setString(5, vo.getStatus());
 			
 			int result = pstmt.executeUpdate();
+			
 			return result;
 		} 			
 	}
 	
-	public int update(int resultId,ProductionVO vo) throws SQLException {
+	public int update(int previousResultId,ProductionVO vo) throws SQLException {
 		
-		String sql = "UPDATE PRODUCTION_RESULT "
-					+"SET PRODUCT_CODE = ?, "
+		String sql = "UPDATE PRODUCTION_RESULT1 "
+					+"SET RESULT_ID = ?, "
+					+"PRODUCT_CODE = ?, "
 					+"PRODUCT_NAME = ?, "
 					+"QUANTITY = ?, "
 					+"STATUS = ? "
@@ -71,19 +75,21 @@ public class ProductionDAO {
 		try(Connection conn = DBUtil.getConnection();
 							  PreparedStatement pstmt = conn.prepareStatement(sql)) {
 			
-			pstmt.setString(1,vo.getProductCode());
-			pstmt.setString(2, vo.getProductName());
-			pstmt.setInt(3,vo.getQuantity());
-			pstmt.setString(4, vo.getStatus());
-			pstmt.setInt(5, resultId);
+			pstmt.setInt(1, vo.getResultId());
+			pstmt.setString(2,vo.getProductCode());
+			pstmt.setString(3, vo.getProductName());
+			pstmt.setInt(4,vo.getQuantity());
+			pstmt.setString(5, vo.getStatus());
+			pstmt.setInt(6, previousResultId);
 			
 			int result = pstmt.executeUpdate();
+			System.out.println("UPDATE 실행 결과: " + result);
 			return result;
 		}
 	}
 	public int delete(int resultId) throws SQLException {
 		
-		String sql = "DELETE FROM PRODUCTION_RESULT WHERE RESULT_ID = ?";
+		String sql = "DELETE FROM PRODUCTION_RESULT1 WHERE RESULT_ID = ?";
 		
 		try(Connection conn = DBUtil.getConnection();
 							  PreparedStatement pstmt = conn.prepareStatement(sql)) {

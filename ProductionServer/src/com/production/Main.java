@@ -12,7 +12,7 @@ public class Main {
 
             ProductionServer server = new ProductionServer();
 
-            server.start();
+          server.start();
 
         } catch (IOException e) {
 

@@ -77,7 +77,8 @@ public class ProductionXmlParser {
 
     public ProductionCreateRequest parseInsert(Document document) {
 
-        return new ProductionCreateRequest(
+    	return new ProductionCreateRequest(
+                getInt(document, "ResultId"),
                 getValue(document, "ProductCode"),
                 getValue(document, "ProductName"),
                 getInt(document, "Quantity"),
@@ -87,11 +88,13 @@ public class ProductionXmlParser {
 
     public ProductionUpdateRequest parseUpdate(Document document) {
 
-        return new ProductionUpdateRequest(
+    	return new ProductionUpdateRequest(
+                getInt(document, "ResultId"),
                 getValue(document, "ProductCode"),
                 getValue(document, "ProductName"),
                 getInt(document, "Quantity"),
-                getValue(document, "Status")
+                getValue(document, "Status"),
+                getInt(document, "PreviousResultId")
         );
     }
 }

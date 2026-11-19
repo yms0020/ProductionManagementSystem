@@ -46,6 +46,11 @@
             btnUpdate = new Button();
             btnDelete = new Button();
             btnClear = new Button();
+            colResultId = new DataGridViewTextBoxColumn();
+            colProductCode = new DataGridViewTextBoxColumn();
+            colProductName = new DataGridViewTextBoxColumn();
+            colQuantity = new DataGridViewTextBoxColumn();
+            colStatus = new DataGridViewTextBoxColumn();
             grpProductionList.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dgvProduction).BeginInit();
             grpProductionDetail.SuspendLayout();
@@ -67,6 +72,7 @@
             // 
             dgvProduction.BackgroundColor = SystemColors.ControlLight;
             dgvProduction.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dgvProduction.Columns.AddRange(new DataGridViewColumn[] { colResultId, colProductCode, colProductName, colQuantity, colStatus });
             dgvProduction.Location = new Point(10, 53);
             dgvProduction.Name = "dgvProduction";
             dgvProduction.RowHeadersWidth = 82;
@@ -130,7 +136,6 @@
             txtResultId.BackColor = SystemColors.Window;
             txtResultId.Location = new Point(180, 53);
             txtResultId.Name = "txtResultId";
-            txtResultId.ReadOnly = true;
             txtResultId.Size = new Size(242, 54);
             txtResultId.TabIndex = 2;
             // 
@@ -249,6 +254,46 @@
             btnClear.UseVisualStyleBackColor = false;
             btnClear.Click += btnClear_Click;
             // 
+            // colResultId
+            // 
+            colResultId.DataPropertyName = "ResultId";
+            colResultId.HeaderText = "실적 ID";
+            colResultId.MinimumWidth = 10;
+            colResultId.Name = "colResultId";
+            colResultId.Width = 219;
+            // 
+            // colProductCode
+            // 
+            colProductCode.DataPropertyName = "ProductCode";
+            colProductCode.HeaderText = "제품 코드";
+            colProductCode.MinimumWidth = 10;
+            colProductCode.Name = "colProductCode";
+            colProductCode.Width = 219;
+            // 
+            // colProductName
+            // 
+            colProductName.DataPropertyName = "ProductName";
+            colProductName.HeaderText = "제품명";
+            colProductName.MinimumWidth = 10;
+            colProductName.Name = "colProductName";
+            colProductName.Width = 219;
+            // 
+            // colQuantity
+            // 
+            colQuantity.DataPropertyName = "Quantity";
+            colQuantity.HeaderText = "생산 수량";
+            colQuantity.MinimumWidth = 10;
+            colQuantity.Name = "colQuantity";
+            colQuantity.Width = 219;
+            // 
+            // colStatus
+            // 
+            colStatus.DataPropertyName = "Status";
+            colStatus.HeaderText = "상태";
+            colStatus.MinimumWidth = 10;
+            colStatus.Name = "colStatus";
+            colStatus.Width = 219;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(14F, 32F);
@@ -292,5 +337,10 @@
         private Button btnUpdate;
         private Button btnDelete;
         private Button btnClear;
+        private DataGridViewTextBoxColumn colResultId;
+        private DataGridViewTextBoxColumn colProductCode;
+        private DataGridViewTextBoxColumn colProductName;
+        private DataGridViewTextBoxColumn colQuantity;
+        private DataGridViewTextBoxColumn colStatus;
     }
 }

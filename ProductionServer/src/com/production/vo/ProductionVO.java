@@ -12,9 +12,10 @@ public class ProductionVO {
 
 	}
 	
-	public ProductionVO(String productCode, String productName,
+	public ProductionVO(int resultId,String productCode, String productName,
             int quantity, String status) {
 
+			this.resultId = resultId;
 			this.productCode = productCode;
 			this.productName = productName;
 			this.quantity = quantity;

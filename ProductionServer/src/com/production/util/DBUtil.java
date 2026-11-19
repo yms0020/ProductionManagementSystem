@@ -8,10 +8,10 @@ public class DBUtil {
 
 	public static Connection getConnection() throws SQLException {
 	
-		String url = "";
+		String url = "jdbc:oracle:thin:@//localhost:1521/EDU";
 		
-		String username = "";
-		String password = "";
+		String username = "webuser";
+		String password = "webuser";
 		
 		return DriverManager.getConnection(url, username, password);
 		
