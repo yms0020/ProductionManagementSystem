@@ -10,9 +10,8 @@ namespace ProductionClient
 {
     public partial class Form1 : Form
     {
-        private int previousResultId; // 셀 클릭 이전 ResultId 저장
         public Form1()
-        {   
+        {
             InitializeComponent();
 
             dgvProduction.AutoGenerateColumns = false; //열 자동 생성 끄기
@@ -170,7 +169,6 @@ namespace ProductionClient
                 //XML 생성
                 string xml = new XElement("Request",
                     new XElement("ResultId", resultId),
-                    new XElement("PreviousResultId", previousResultId),
                     new XElement("Action", "UPDATE"),
                     new XElement("ProductCode", productCode),
                     new XElement("ProductName", productName),
@@ -334,6 +332,8 @@ namespace ProductionClient
             txtQuantity.Clear();
             txtResultId.Clear();
             cmbStatus.SelectedIndex = -1; //Items와 SelectedIndex는 ComboBox의 속성이다.
+
+            txtResultId.ReadOnly = false;
         }
 
         private List<ProductionDTO> LoadProductionData() //조회 데이터 List 형태로 받는다.
@@ -402,17 +402,69 @@ namespace ProductionClient
             //row.Cells["ProductName"] → ProductName이라는 이름의 열
 
             txtResultId.Text = row.Cells[0].Value?.ToString() ?? "";
-            previousResultId = int.Parse(row.Cells[0].Value?.ToString() ?? "");
             txtProductCode.Text = row.Cells[1].Value?.ToString() ?? "";
             txtProductName.Text = row.Cells[2].Value?.ToString() ?? "";
             txtQuantity.Text = row.Cells[3].Value?.ToString() ?? "";
             cmbStatus.Text = row.Cells[4].Value?.ToString() ?? "";
+
+            txtResultId.ReadOnly = true;
 
         }
 
         private void dgvProduction_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
 
+        }
+
+        private void btnOpenSearch_Click(object sender, EventArgs e)
+        {
+            SearchForm searchForm = new SearchForm(); //검색창 객체 생성
+            if (searchForm.ShowDialog() == DialogResult.OK) //검색창을 열고 닫힐 때까지 기다림 == 사용자가 검색 버튼을 눌러 정상적으로 종료했는지 확인
+            {
+                string searchType = searchForm.SearchType; //검색 조건 가져오기
+                string keyword = searchForm.Keyword; //검색어 가져오기
+
+                string xml = new XElement("Request",
+                new XElement("Action", "SEARCH"),
+                new XElement("SearchType", searchType),
+                new XElement("Keyword", keyword)
+                ).ToString(SaveOptions.DisableFormatting);
+
+
+                string responseXml = sendRequest(xml);
+
+                MessageBox.Show(responseXml);
+
+                XDocument doc = XDocument.Parse(responseXml);
+
+                string? success = doc.Root?.Element("Success")?.Value;
+
+                if (success == "true")
+                {
+                    List<ProductionDTO> searchResults = new List<ProductionDTO>();
+
+                    foreach (XElement item in doc.Root!.Descendants("Item"))
+                    {
+                        ProductionDTO productionDTO = new ProductionDTO
+                        {
+                            ResultId = (int)item.Element("ResultId")!,
+                            ProductCode = (string?)item.Element("ProductCode") ?? string.Empty,
+                            ProductName = (string?)item.Element("ProductName") ?? string.Empty,
+                            Quantity = (int)item.Element("Quantity")!,
+                            Status = (string?)item.Element("Status") ?? string.Empty
+                        };
+
+                        searchResults.Add(productionDTO);
+                    }
+
+                    dgvProduction.DataSource = null;
+                    dgvProduction.DataSource = searchResults.OrderBy(x => x.ResultId).ToList();
+                }
+                else
+                {
+                    MessageBox.Show("검색 실패");
+                }
+            } 
         }
     }
 

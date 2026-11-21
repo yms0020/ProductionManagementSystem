@@ -70,18 +70,14 @@ public class ProductionServer {
                         sendResponse(out, response);
 
                     } catch (Exception e) {
-                    	
-                        System.err.println(
-                                "요청 처리 오류: " + e.getMessage()
-                        );
                         
                         String message = "요청 처리 실패";
                         
-                        if (e instanceof SQLException sqlEx) {
-
-                            if (sqlEx.getErrorCode() == 1) {
-                                message = "이미 존재하는 ResultId입니다.";
-                            }
+                        if (e instanceof IllegalArgumentException) {
+                            message = e.getMessage();
+                            System.out.println(message); //오라클 에러가 발생 전에 서비스 로직으로 검증 
+                        } else {
+                        	System.err.println("요청 처리 오류: " + e.getMessage());
                         }
 
                         try {
@@ -193,6 +189,51 @@ public class ProductionServer {
 
                 return resultResponse(result);
             }
+            
+            case "SEARCH": {
+
+                String searchType = parser.getValue(document, "SearchType");
+
+                String keyword = parser.getValue(document, "Keyword");
+
+                List<ProductionVO> list = service.search(searchType, keyword);
+                
+                StringBuilder sb = new StringBuilder();
+                
+                sb.append("<Response><Success>true</Success><Items>");
+                
+                for (ProductionVO vo : list) {
+
+                    sb.append("<Item>");
+
+                    sb.append("<ResultId>")
+                      .append(vo.getResultId())
+                      .append("</ResultId>");
+
+                    sb.append("<ProductCode>")
+                      .append(escapeXml(vo.getProductCode()))
+                      .append("</ProductCode>");
+
+                    sb.append("<ProductName>")
+                      .append(escapeXml(vo.getProductName()))
+                      .append("</ProductName>");
+
+                    sb.append("<Quantity>")
+                      .append(vo.getQuantity())
+                      .append("</Quantity>");
+
+                    sb.append("<Status>")
+                      .append(escapeXml(vo.getStatus()))
+                      .append("</Status>");
+
+                    sb.append("</Item>");
+                }
+
+                sb.append("</Items></Response>");
+
+                return sb.toString();
+            }
+                
 
             default:
                 throw new IllegalArgumentException(

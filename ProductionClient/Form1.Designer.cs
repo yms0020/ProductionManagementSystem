@@ -30,6 +30,11 @@
         {
             grpProductionList = new GroupBox();
             dgvProduction = new DataGridView();
+            colResultId = new DataGridViewTextBoxColumn();
+            colProductCode = new DataGridViewTextBoxColumn();
+            colProductName = new DataGridViewTextBoxColumn();
+            colQuantity = new DataGridViewTextBoxColumn();
+            colStatus = new DataGridViewTextBoxColumn();
             grpProductionDetail = new GroupBox();
             cmbStatus = new ComboBox();
             txtQuantity = new TextBox();
@@ -46,11 +51,7 @@
             btnUpdate = new Button();
             btnDelete = new Button();
             btnClear = new Button();
-            colResultId = new DataGridViewTextBoxColumn();
-            colProductCode = new DataGridViewTextBoxColumn();
-            colProductName = new DataGridViewTextBoxColumn();
-            colQuantity = new DataGridViewTextBoxColumn();
-            colStatus = new DataGridViewTextBoxColumn();
+            btnOpenSearch = new Button();
             grpProductionList.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dgvProduction).BeginInit();
             grpProductionDetail.SuspendLayout();
@@ -80,6 +81,46 @@
             dgvProduction.TabIndex = 0;
             dgvProduction.CellClick += dgvProduction_CellClick;
             // 
+            // colResultId
+            // 
+            colResultId.DataPropertyName = "ResultId";
+            colResultId.HeaderText = "실적 ID";
+            colResultId.MinimumWidth = 10;
+            colResultId.Name = "colResultId";
+            colResultId.Width = 219;
+            // 
+            // colProductCode
+            // 
+            colProductCode.DataPropertyName = "ProductCode";
+            colProductCode.HeaderText = "제품 코드";
+            colProductCode.MinimumWidth = 10;
+            colProductCode.Name = "colProductCode";
+            colProductCode.Width = 219;
+            // 
+            // colProductName
+            // 
+            colProductName.DataPropertyName = "ProductName";
+            colProductName.HeaderText = "제품명";
+            colProductName.MinimumWidth = 10;
+            colProductName.Name = "colProductName";
+            colProductName.Width = 219;
+            // 
+            // colQuantity
+            // 
+            colQuantity.DataPropertyName = "Quantity";
+            colQuantity.HeaderText = "생산 수량";
+            colQuantity.MinimumWidth = 10;
+            colQuantity.Name = "colQuantity";
+            colQuantity.Width = 219;
+            // 
+            // colStatus
+            // 
+            colStatus.DataPropertyName = "Status";
+            colStatus.HeaderText = "상태";
+            colStatus.MinimumWidth = 10;
+            colStatus.Name = "colStatus";
+            colStatus.Width = 219;
+            // 
             // grpProductionDetail
             // 
             grpProductionDetail.Controls.Add(cmbStatus);
@@ -95,7 +136,7 @@
             grpProductionDetail.Font = new Font("맑은 고딕", 13F, FontStyle.Bold);
             grpProductionDetail.Location = new Point(854, 54);
             grpProductionDetail.Name = "grpProductionDetail";
-            grpProductionDetail.Size = new Size(459, 632);
+            grpProductionDetail.Size = new Size(433, 632);
             grpProductionDetail.TabIndex = 1;
             grpProductionDetail.TabStop = false;
             grpProductionDetail.Text = "실적 상세 정보";
@@ -173,7 +214,7 @@
             // 
             lblProductCode.AutoSize = true;
             lblProductCode.Font = new Font("맑은 고딕", 10.125F, FontStyle.Bold);
-            lblProductCode.Location = new Point(25, 156);
+            lblProductCode.Location = new Point(15, 156);
             lblProductCode.Name = "lblProductCode";
             lblProductCode.Size = new Size(134, 37);
             lblProductCode.TabIndex = 3;
@@ -183,7 +224,7 @@
             // 
             lblResultId.AutoSize = true;
             lblResultId.Font = new Font("맑은 고딕", 10.125F, FontStyle.Bold, GraphicsUnit.Point, 129);
-            lblResultId.Location = new Point(25, 53);
+            lblResultId.Location = new Point(15, 53);
             lblResultId.Name = "lblResultId";
             lblResultId.Size = new Size(108, 37);
             lblResultId.TabIndex = 2;
@@ -194,7 +235,7 @@
             btnSelect.BackColor = SystemColors.Highlight;
             btnSelect.Font = new Font("맑은 고딕", 10.125F, FontStyle.Bold, GraphicsUnit.Point, 129);
             btnSelect.ForeColor = SystemColors.Window;
-            btnSelect.Location = new Point(222, 728);
+            btnSelect.Location = new Point(52, 728);
             btnSelect.Name = "btnSelect";
             btnSelect.Size = new Size(170, 65);
             btnSelect.TabIndex = 2;
@@ -207,7 +248,7 @@
             btnInsert.BackColor = Color.Green;
             btnInsert.Font = new Font("맑은 고딕", 10.125F, FontStyle.Bold);
             btnInsert.ForeColor = SystemColors.Window;
-            btnInsert.Location = new Point(409, 728);
+            btnInsert.Location = new Point(265, 728);
             btnInsert.Name = "btnInsert";
             btnInsert.Size = new Size(170, 65);
             btnInsert.TabIndex = 3;
@@ -220,7 +261,7 @@
             btnUpdate.BackColor = Color.FromArgb(255, 128, 0);
             btnUpdate.Font = new Font("맑은 고딕", 10.125F, FontStyle.Bold);
             btnUpdate.ForeColor = SystemColors.Window;
-            btnUpdate.Location = new Point(596, 728);
+            btnUpdate.Location = new Point(478, 728);
             btnUpdate.Name = "btnUpdate";
             btnUpdate.Size = new Size(170, 65);
             btnUpdate.TabIndex = 4;
@@ -233,7 +274,7 @@
             btnDelete.BackColor = Color.Red;
             btnDelete.Font = new Font("맑은 고딕", 10.125F, FontStyle.Bold);
             btnDelete.ForeColor = SystemColors.Window;
-            btnDelete.Location = new Point(783, 728);
+            btnDelete.Location = new Point(691, 728);
             btnDelete.Name = "btnDelete";
             btnDelete.Size = new Size(170, 65);
             btnDelete.TabIndex = 5;
@@ -246,7 +287,7 @@
             btnClear.BackColor = SystemColors.AppWorkspace;
             btnClear.Font = new Font("맑은 고딕", 10.125F, FontStyle.Bold);
             btnClear.ForeColor = SystemColors.Window;
-            btnClear.Location = new Point(970, 728);
+            btnClear.Location = new Point(904, 728);
             btnClear.Name = "btnClear";
             btnClear.Size = new Size(170, 65);
             btnClear.TabIndex = 6;
@@ -254,52 +295,26 @@
             btnClear.UseVisualStyleBackColor = false;
             btnClear.Click += btnClear_Click;
             // 
-            // colResultId
+            // btnOpenSearch
             // 
-            colResultId.DataPropertyName = "ResultId";
-            colResultId.HeaderText = "실적 ID";
-            colResultId.MinimumWidth = 10;
-            colResultId.Name = "colResultId";
-            colResultId.Width = 219;
-            // 
-            // colProductCode
-            // 
-            colProductCode.DataPropertyName = "ProductCode";
-            colProductCode.HeaderText = "제품 코드";
-            colProductCode.MinimumWidth = 10;
-            colProductCode.Name = "colProductCode";
-            colProductCode.Width = 219;
-            // 
-            // colProductName
-            // 
-            colProductName.DataPropertyName = "ProductName";
-            colProductName.HeaderText = "제품명";
-            colProductName.MinimumWidth = 10;
-            colProductName.Name = "colProductName";
-            colProductName.Width = 219;
-            // 
-            // colQuantity
-            // 
-            colQuantity.DataPropertyName = "Quantity";
-            colQuantity.HeaderText = "생산 수량";
-            colQuantity.MinimumWidth = 10;
-            colQuantity.Name = "colQuantity";
-            colQuantity.Width = 219;
-            // 
-            // colStatus
-            // 
-            colStatus.DataPropertyName = "Status";
-            colStatus.HeaderText = "상태";
-            colStatus.MinimumWidth = 10;
-            colStatus.Name = "colStatus";
-            colStatus.Width = 219;
+            btnOpenSearch.BackColor = Color.Khaki;
+            btnOpenSearch.Font = new Font("맑은 고딕", 10.125F, FontStyle.Bold);
+            btnOpenSearch.ForeColor = SystemColors.Window;
+            btnOpenSearch.Location = new Point(1117, 728);
+            btnOpenSearch.Name = "btnOpenSearch";
+            btnOpenSearch.Size = new Size(170, 65);
+            btnOpenSearch.TabIndex = 7;
+            btnOpenSearch.Text = "검색";
+            btnOpenSearch.UseVisualStyleBackColor = false;
+            btnOpenSearch.Click += btnOpenSearch_Click;
             // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(14F, 32F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.Control;
-            ClientSize = new Size(1363, 859);
+            ClientSize = new Size(1363, 863);
+            Controls.Add(btnOpenSearch);
             Controls.Add(btnClear);
             Controls.Add(btnDelete);
             Controls.Add(btnUpdate);
@@ -342,5 +357,6 @@
         private DataGridViewTextBoxColumn colProductName;
         private DataGridViewTextBoxColumn colQuantity;
         private DataGridViewTextBoxColumn colStatus;
+        private Button btnOpenSearch;
     }
 }

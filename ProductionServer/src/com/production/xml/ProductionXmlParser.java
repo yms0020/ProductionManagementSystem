@@ -93,8 +93,7 @@ public class ProductionXmlParser {
                 getValue(document, "ProductCode"),
                 getValue(document, "ProductName"),
                 getInt(document, "Quantity"),
-                getValue(document, "Status"),
-                getInt(document, "PreviousResultId")
+                getValue(document, "Status")
         );
     }
 }

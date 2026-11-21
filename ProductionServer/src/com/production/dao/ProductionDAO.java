@@ -62,11 +62,10 @@ public class ProductionDAO {
 		} 			
 	}
 	
-	public int update(int previousResultId,ProductionVO vo) throws SQLException {
+	public int update(ProductionVO vo) throws SQLException {
 		
 		String sql = "UPDATE PRODUCTION_RESULT1 "
-					+"SET RESULT_ID = ?, "
-					+"PRODUCT_CODE = ?, "
+					+"SET PRODUCT_CODE = ?, "
 					+"PRODUCT_NAME = ?, "
 					+"QUANTITY = ?, "
 					+"STATUS = ? "
@@ -75,12 +74,11 @@ public class ProductionDAO {
 		try(Connection conn = DBUtil.getConnection();
 							  PreparedStatement pstmt = conn.prepareStatement(sql)) {
 			
-			pstmt.setInt(1, vo.getResultId());
-			pstmt.setString(2,vo.getProductCode());
-			pstmt.setString(3, vo.getProductName());
-			pstmt.setInt(4,vo.getQuantity());
-			pstmt.setString(5, vo.getStatus());
-			pstmt.setInt(6, previousResultId);
+			pstmt.setString(1,vo.getProductCode());
+			pstmt.setString(2, vo.getProductName());
+			pstmt.setInt(3,vo.getQuantity());
+			pstmt.setString(4, vo.getStatus());
+			pstmt.setInt(5, vo.getResultId());
 			
 			int result = pstmt.executeUpdate();
 			System.out.println("UPDATE 실행 결과: " + result);
@@ -100,4 +98,90 @@ public class ProductionDAO {
 			return result;
 		}
 	}
+	
+	public boolean existsByResultId(int resultId) throws SQLException { //result가 이미 있는지 확인 로직
+		String sql = "SELECT COUNT(*) "
+				+ "FROM PRODUCTION_RESULT1 "
+				+ "WHERE RESULT_ID = ?";
+		
+		try(Connection conn = DBUtil.getConnection();
+							  PreparedStatement pstmt = conn.prepareStatement(sql);) {
+			
+			pstmt.setInt(1, resultId);
+			
+			try (ResultSet rs = pstmt.executeQuery()) {
+
+		        if (rs.next()) {
+		            int count = rs.getInt(1); //getInt(1)은 현재 행의 첫 번째 칼럼 값을 int로 가져온다.
+
+		            return count > 0; // boolean
+		        }
+		        
+		        return false;
+		        
+//		        prepareStatement() → SQL 준비
+//		        setInt() → SQL의 ?에 ResultId 설정
+//		        executeQuery() → SQL 실행
+//		        rs.next() → 조회 결과 행으로 이동
+//		        rs.getInt(1) → 조회된 개수 확인
+			}
+		}
+	}
+		
+		public List<ProductionVO> search(String searchType, String keyword) throws SQLException {
+
+			String sql;
+			
+			if(searchType.equals("RESULT_ID")) {
+				       sql = "SELECT * "
+						+ "FROM PRODUCTION_RESULT1 "
+						+ "WHERE RESULT_ID = ?";
+			} else if(searchType.equals("PRODUCT_CODE")) {
+			           sql = "SELECT * "
+						+ "FROM PRODUCTION_RESULT1 "
+						+ "WHERE PRODUCT_CODE = ?";
+			} else if(searchType.equals("PRODUCT_NAME")) {
+					   sql = "SELECT * "
+						+ "FROM PRODUCTION_RESULT1 "
+						+ "WHERE PRODUCT_NAME = ?";
+			} else if(searchType.equals("QUANTITY")) {
+				       sql = "SELECT * "
+						+ "FROM PRODUCTION_RESULT1 "
+						+ "WHERE QUANTITY = ?";
+			} else if(searchType.equals("STATUS")) {
+				       sql = "SELECT * "
+						+ "FROM PRODUCTION_RESULT1 "
+						+ "WHERE STATUS = ?";
+			} else {
+				throw new IllegalArgumentException("지원하지 않는 검색 조건입니다.");
+			}
+			
+			try(Connection conn = DBUtil.getConnection(); 
+								  PreparedStatement pstmt = conn.prepareStatement(sql);) {
+				
+				if(searchType.equals("RESULT_ID")||searchType.equals("QUANTITY")) {
+					pstmt.setInt(1, Integer.parseInt(keyword));
+				} else if(searchType.equals("PRODUCT_CODE")||searchType.equals("PRODUCT_NAME")||searchType.equals("STATUS")) {
+					pstmt.setString(1,keyword);
+				} else {throw new IllegalArgumentException("지원하지 않는 검색 조건입니다.");}
+				
+				List<ProductionVO> list = new ArrayList<>();
+				
+				try(ResultSet rs = pstmt.executeQuery()) {
+					
+					while(rs.next()) {
+						ProductionVO vo = new ProductionVO();
+						
+						vo.setResultId(rs.getInt("Result_ID"));
+						vo.setProductCode(rs.getString("PRODUCT_CODE"));
+						vo.setProductName(rs.getString("PRODUCT_NAME"));
+						vo.setQuantity(rs.getInt("QUANTITY"));
+						vo.setStatus(rs.getString("STATUS"));
+						
+						list.add(vo);
+					}
+					return list;
+				}
+			}
+		} 
 }

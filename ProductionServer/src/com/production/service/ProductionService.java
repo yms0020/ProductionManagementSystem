@@ -19,7 +19,7 @@ public class ProductionService {
 
     // INSERT
     public int register(ProductionCreateRequest request) throws SQLException {
-
+    	
         if (request == null) {
             throw new IllegalArgumentException("생산 실적 정보가 없습니다.");
         }
@@ -43,6 +43,10 @@ public class ProductionService {
                 request.getQuantity(),
                 request.getStatus()
         );
+        
+        if(dao.existsByResultId(vo.getResultId())) {
+        	throw new IllegalArgumentException("이미 존재하는 ResultId입니다.");
+        }
 
         return dao.insert(vo);
     }
@@ -50,6 +54,14 @@ public class ProductionService {
     // SELECT
     public List<ProductionVO> findAll() throws SQLException {
         return dao.findAll();
+    }
+    
+    public List<ProductionVO> search(String searchType, String keyword) throws SQLException {
+    	if(searchType == null ||searchType.isBlank()) {throw new IllegalArgumentException("검색 조건을 확인해주세요");}
+    	
+    	if(keyword == null ||keyword.isBlank()) {throw new IllegalArgumentException("검색어를 확인해주세요");}
+    	
+        return dao.search(searchType, keyword);
     }
 
     // UPDATE
@@ -71,9 +83,6 @@ public class ProductionService {
             throw new IllegalArgumentException("생산 수량은 1 이상이어야 합니다.");
         }
         
-        if(request.getPreviousResultId() <= 0) {
-        	throw new IllegalArgumentException("잘못된 ResultId입니다.");
-        }
 
         ProductionVO vo = new ProductionVO(
                 request.getResultId(),
@@ -83,7 +92,7 @@ public class ProductionService {
                 request.getStatus()
         );
 
-        return dao.update(request.getPreviousResultId(),vo);
+        return  dao.update(vo);
     }
 
     // DELETE

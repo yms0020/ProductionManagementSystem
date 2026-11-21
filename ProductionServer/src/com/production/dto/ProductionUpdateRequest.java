@@ -8,7 +8,6 @@ public class ProductionUpdateRequest {
     private String productName;
     private int quantity;
     private String status;
-    private int previousResultId;
 
     // 기본 생성자
     public ProductionUpdateRequest() {
@@ -20,24 +19,15 @@ public class ProductionUpdateRequest {
             String productCode,
             String productName,
             int quantity,
-            String status,
-            int previousResultId) {
+            String status
+            ) {
 
         this.resultId = resultId;
         this.productCode = productCode;
         this.productName = productName;
         this.quantity = quantity;
         this.status = status;
-        this.previousResultId = previousResultId;
     }
-
-    public int getPreviousResultId() {
-		return previousResultId;
-	}
-
-	public void setPreviousResultId(int previousResultId) {
-		this.previousResultId = previousResultId;
-	}
     
     public int getResultId() {
         return resultId;
