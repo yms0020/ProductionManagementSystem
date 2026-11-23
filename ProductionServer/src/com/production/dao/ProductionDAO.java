@@ -42,9 +42,20 @@ public class ProductionDAO {
 	
 	public int insert(ProductionVO vo) throws SQLException {
 		
-		String sql = "INSERT INTO PRODUCTION_RESULT1 "
-		           + "(RESULT_ID,PRODUCT_CODE,PRODUCT_NAME,QUANTITY,STATUS) "
-		           + "VALUES (?,?,?,?,?)";
+//		String sql = "INSERT INTO PRODUCTION_RESULT1 "
+//		           + "(RESULT_ID,PRODUCT_CODE,PRODUCT_NAME,QUANTITY,STATUS) "
+//		           + "VALUES (?,?,?,?,?)";
+		
+		String sql = "MERGE INTO PRODUCTION_RESULT1 t "
+	               + "USING (SELECT ? AS RESULT_ID, "
+	               + "              ? AS PRODUCT_CODE, "
+	               + "              ? AS PRODUCT_NAME, "
+	               + "              ? AS QUANTITY, "
+	               + "              ? AS STATUS FROM DUAL) s "
+	               + "ON (t.RESULT_ID = s.RESULT_ID) "
+	               + "WHEN NOT MATCHED THEN "
+	               + "INSERT (RESULT_ID, PRODUCT_CODE, PRODUCT_NAME, QUANTITY, STATUS) "
+	               + "VALUES (s.RESULT_ID, s.PRODUCT_CODE, s.PRODUCT_NAME, s.QUANTITY, s.STATUS)";
 		
 		try(Connection conn = DBUtil.getConnection();
 							  PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -129,32 +140,29 @@ public class ProductionDAO {
 	}
 		
 		public List<ProductionVO> search(String searchType, String keyword) throws SQLException {
-
-			String sql;
 			
-			if(searchType.equals("RESULT_ID")) {
-				       sql = "SELECT * "
-						+ "FROM PRODUCTION_RESULT1 "
-						+ "WHERE RESULT_ID = ?";
-			} else if(searchType.equals("PRODUCT_CODE")) {
-			           sql = "SELECT * "
-						+ "FROM PRODUCTION_RESULT1 "
-						+ "WHERE PRODUCT_CODE = ?";
-			} else if(searchType.equals("PRODUCT_NAME")) {
-					   sql = "SELECT * "
-						+ "FROM PRODUCTION_RESULT1 "
-						+ "WHERE PRODUCT_NAME = ?";
-			} else if(searchType.equals("QUANTITY")) {
-				       sql = "SELECT * "
-						+ "FROM PRODUCTION_RESULT1 "
-						+ "WHERE QUANTITY = ?";
-			} else if(searchType.equals("STATUS")) {
-				       sql = "SELECT * "
-						+ "FROM PRODUCTION_RESULT1 "
-						+ "WHERE STATUS = ?";
+			String columnName;
+
+			if (searchType.equals("RESULT_ID")) {
+			    columnName = "RESULT_ID";
+
+			} else if (searchType.equals("PRODUCT_CODE")) {
+			    columnName = "PRODUCT_CODE";
+
+			} else if (searchType.equals("PRODUCT_NAME")) {
+			    columnName = "PRODUCT_NAME";
+
+			} else if (searchType.equals("QUANTITY")) {
+			    columnName = "QUANTITY";
+
+			} else if (searchType.equals("STATUS")) {
+			    columnName = "STATUS";
+
 			} else {
-				throw new IllegalArgumentException("지원하지 않는 검색 조건입니다.");
+			    throw new IllegalArgumentException("지원하지 않는 검색 조건입니다.");
 			}
+			
+			String sql = "SELECT * FROM PRODUCTION_RESULT1 WHERE " + columnName + " = ?";
 			
 			try(Connection conn = DBUtil.getConnection(); 
 								  PreparedStatement pstmt = conn.prepareStatement(sql);) {
