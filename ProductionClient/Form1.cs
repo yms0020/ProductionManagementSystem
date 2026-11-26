@@ -464,7 +464,103 @@ namespace ProductionClient
                 {
                     MessageBox.Show("검색 실패");
                 }
-            } 
+            }
+        }
+        private void btnDetailSearch_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                // 입력값 가져오기
+                string resultId = txtResultId.Text.Trim();
+                string productCode = txtProductCode.Text.Trim();
+                string productName = txtProductName.Text.Trim();
+                string quantity = txtQuantity.Text.Trim();
+                string status = cmbStatus.Text.Trim();
+
+                // 모든 검색 조건 미입력 검사
+                if (string.IsNullOrWhiteSpace(resultId)
+                    && string.IsNullOrWhiteSpace(productCode)
+                    && string.IsNullOrWhiteSpace(productName)
+                    && string.IsNullOrWhiteSpace(quantity)
+                    && string.IsNullOrWhiteSpace(status))
+                {
+                    MessageBox.Show("검색 조건을 하나 이상 입력해주세요.");
+                    return;
+                }
+
+                // 실적 ID 유효성 검사
+                if (!string.IsNullOrWhiteSpace(resultId))
+                {
+                    if (!int.TryParse(resultId, out _))
+                    {
+                        MessageBox.Show("실적 ID는 정수로 입력해주세요.");
+                        return;
+                    }
+                }
+
+                // 생산 수량 유효성 검사
+                if (!string.IsNullOrWhiteSpace(quantity))
+                {
+                    if (!int.TryParse(quantity, out _))
+                    {
+                        MessageBox.Show("생산 수량은 정수로 입력해주세요.");
+                        return;
+                    }
+                }
+
+                // XML 생성
+                string xml = new XElement("Request",
+                    new XElement("Action", "DETAIL_SEARCH"),
+                    new XElement("ResultId", resultId),
+                    new XElement("ProductCode", productCode),
+                    new XElement("ProductName", productName),
+                    new XElement("Quantity", quantity),
+                    new XElement("Status", status)
+                ).ToString(SaveOptions.DisableFormatting);
+
+                // 서버 요청 및 응답
+                string responseXml = sendRequest(xml);
+
+                // 응답 XML 파싱
+                XDocument doc = XDocument.Parse(responseXml);
+
+                string? success = doc.Root?.Element("Success")?.Value;
+
+                if (success == "true")
+                {
+                    List<ProductionDTO> searchResults = new List<ProductionDTO>();
+
+                    foreach (XElement item in doc.Root!.Descendants("Item"))
+                    {
+                        ProductionDTO productionDTO = new ProductionDTO
+                        {
+                            ResultId = (int)item.Element("ResultId")!,
+                            ProductCode = (string?)item.Element("ProductCode") ?? string.Empty,
+                            ProductName = (string?)item.Element("ProductName") ?? string.Empty,
+                            Quantity = (int)item.Element("Quantity")!,
+                            Status = (string?)item.Element("Status") ?? string.Empty
+                        };
+
+                        searchResults.Add(productionDTO);
+                    }
+
+                    // 검색 결과 그리드 출력
+                    dgvProduction.DataSource = null;
+                    dgvProduction.DataSource = searchResults
+                        .OrderBy(x => x.ResultId).ToList();
+                }
+                else
+                {
+                    string message = (string?)doc.Root?.Element("Message")
+                        ?? "상세 검색 실패";
+
+                    throw new InvalidOperationException(message);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("상세 검색 오류 : " + ex.Message);
+            }
         }
     }
 

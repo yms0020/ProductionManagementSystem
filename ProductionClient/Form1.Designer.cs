@@ -52,6 +52,8 @@
             btnDelete = new Button();
             btnClear = new Button();
             btnOpenSearch = new Button();
+            btnDetailSearch = new Button();
+            button1 = new Button();
             grpProductionList.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dgvProduction).BeginInit();
             grpProductionDetail.SuspendLayout();
@@ -123,6 +125,7 @@
             // 
             // grpProductionDetail
             // 
+            grpProductionDetail.Controls.Add(btnDetailSearch);
             grpProductionDetail.Controls.Add(cmbStatus);
             grpProductionDetail.Controls.Add(txtQuantity);
             grpProductionDetail.Controls.Add(txtProductName);
@@ -308,12 +311,35 @@
             btnOpenSearch.UseVisualStyleBackColor = false;
             btnOpenSearch.Click += btnOpenSearch_Click;
             // 
+            // btnDetailSearch
+            // 
+            btnDetailSearch.BackColor = SystemColors.ActiveCaption;
+            btnDetailSearch.Font = new Font("맑은 고딕", 10.125F, FontStyle.Bold);
+            btnDetailSearch.ForeColor = SystemColors.Window;
+            btnDetailSearch.Location = new Point(263, 567);
+            btnDetailSearch.Name = "btnDetailSearch";
+            btnDetailSearch.Size = new Size(170, 65);
+            btnDetailSearch.TabIndex = 8;
+            btnDetailSearch.Text = "상세 검색";
+            btnDetailSearch.UseVisualStyleBackColor = false;
+            btnDetailSearch.Click += btnDetailSearch_Click;
+            // 
+            // button1
+            // 
+            button1.Location = new Point(1342, 643);
+            button1.Name = "button1";
+            button1.Size = new Size(150, 46);
+            button1.TabIndex = 8;
+            button1.Text = "button1";
+            button1.UseVisualStyleBackColor = true;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(14F, 32F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.Control;
             ClientSize = new Size(1363, 863);
+            Controls.Add(button1);
             Controls.Add(btnOpenSearch);
             Controls.Add(btnClear);
             Controls.Add(btnDelete);
@@ -358,5 +384,7 @@
         private DataGridViewTextBoxColumn colQuantity;
         private DataGridViewTextBoxColumn colStatus;
         private Button btnOpenSearch;
+        private Button button1;
+        private Button btnDetailSearch;
     }
 }

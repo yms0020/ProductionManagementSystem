@@ -233,7 +233,58 @@ public class ProductionServer {
 
                 return sb.toString();
             }
-                
+            
+            case "DETAIL_SEARCH": {
+
+                String resultId = parser.getValue(document, "ResultId");
+                String productCode = parser.getValue(document, "ProductCode");
+                String productName = parser.getValue(document, "ProductName");
+                String quantity = parser.getValue(document, "Quantity");
+                String status = parser.getValue(document, "Status");
+
+                List<ProductionVO> list = service.detailSearch(
+                        resultId,
+                        productCode,
+                        productName,
+                        quantity,
+                        status
+                );
+
+                StringBuilder sb = new StringBuilder();
+
+                sb.append("<Response><Success>true</Success><Items>");
+
+                for (ProductionVO vo : list) {
+
+                    sb.append("<Item>");
+
+                    sb.append("<ResultId>")
+                      .append(vo.getResultId())
+                      .append("</ResultId>");
+
+                    sb.append("<ProductCode>")
+                      .append(escapeXml(vo.getProductCode()))
+                      .append("</ProductCode>");
+
+                    sb.append("<ProductName>")
+                      .append(escapeXml(vo.getProductName()))
+                      .append("</ProductName>");
+
+                    sb.append("<Quantity>")
+                      .append(vo.getQuantity())
+                      .append("</Quantity>");
+
+                    sb.append("<Status>")
+                      .append(escapeXml(vo.getStatus()))
+                      .append("</Status>");
+
+                    sb.append("</Item>");
+                }
+
+                sb.append("</Items></Response>");
+
+                return sb.toString();
+            }
 
             default:
                 throw new IllegalArgumentException(

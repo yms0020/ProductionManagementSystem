@@ -63,6 +63,49 @@ public class ProductionService {
     	
         return dao.search(searchType, keyword);
     }
+    
+    public List<ProductionVO> detailSearch(
+            String resultId,
+            String productCode,
+            String productName,
+            String quantity,
+            String status) throws SQLException {
+    	// 모든 검색 조건이 비어 있는지 확인
+    	if ((resultId == null || resultId.isBlank())
+    	        && (productCode == null || productCode.isBlank())
+    	        && (productName == null || productName.isBlank())
+    	        && (quantity == null || quantity.isBlank())
+    	        && (status == null || status.isBlank())) {
+
+    	    throw new IllegalArgumentException("검색 조건을 하나 이상 입력해주세요.");
+    	}
+    	
+    	// 실적 ID 유효성 검사
+    	if (resultId != null && !resultId.isBlank()) {
+    	    try {
+    	        Integer.parseInt(resultId);
+    	    } catch (NumberFormatException e) {
+    	        throw new IllegalArgumentException("실적 ID는 정수로 입력해주세요.");
+    	    }
+    	}
+
+    	// 생산 수량 유효성 검사
+    	if (quantity != null && !quantity.isBlank()) {
+    	    try {
+    	        Integer.parseInt(quantity);
+    	    } catch (NumberFormatException e) {
+    	        throw new IllegalArgumentException("생산 수량은 정수로 입력해주세요.");
+    	    }
+    	}
+
+        return dao.detailSearch(
+                resultId,
+                productCode,
+                productName,
+                quantity,
+                status
+        );
+    }
 
     // UPDATE
     public int update(ProductionUpdateRequest request) throws SQLException {
@@ -104,4 +147,5 @@ public class ProductionService {
 
         return dao.delete(resultId);
     }
+    
 }

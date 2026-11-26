@@ -141,28 +141,27 @@ public class ProductionDAO {
 		
 		public List<ProductionVO> search(String searchType, String keyword) throws SQLException {
 			
-			String columnName;
+			String sql = "SELECT * FROM PRODUCTION_RESULT1 WHERE 1=1";
 
-			if (searchType.equals("RESULT_ID")) {
-			    columnName = "RESULT_ID";
-
-			} else if (searchType.equals("PRODUCT_CODE")) {
-			    columnName = "PRODUCT_CODE";
-
-			} else if (searchType.equals("PRODUCT_NAME")) {
-			    columnName = "PRODUCT_NAME";
-
-			} else if (searchType.equals("QUANTITY")) {
-			    columnName = "QUANTITY";
-
-			} else if (searchType.equals("STATUS")) {
-			    columnName = "STATUS";
-
-			} else {
-			    throw new IllegalArgumentException("지원하지 않는 검색 조건입니다.");
+			if (searchType.equals("RESULT_ID") && !keyword.isBlank()) {
+			    sql += " AND RESULT_ID = ?";
 			}
-			
-			String sql = "SELECT * FROM PRODUCTION_RESULT1 WHERE " + columnName + " = ?";
+
+			if (searchType.equals("PRODUCT_CODE") && !keyword.isBlank()) {
+			    sql += " AND PRODUCT_CODE = ?";
+			}
+
+			if (searchType.equals("PRODUCT_NAME") && !keyword.isBlank()) {
+			    sql += " AND PRODUCT_NAME = ?";
+			}
+
+			if (searchType.equals("QUANTITY") && !keyword.isBlank()) {
+			    sql += " AND QUANTITY = ?";
+			}
+
+			if (searchType.equals("STATUS") && !keyword.isBlank()) {
+			    sql += " AND STATUS = ?";
+			}
 			
 			try(Connection conn = DBUtil.getConnection(); 
 								  PreparedStatement pstmt = conn.prepareStatement(sql);) {
@@ -192,4 +191,80 @@ public class ProductionDAO {
 				}
 			}
 		} 
+		
+		public List<ProductionVO> detailSearch(
+		        String resultId, //검색 조건을 각각 파라미터로 받는다. 제외 일때는 ""로 넘겨 받는다. 그래서 resultId랑 quantity도 String으로 파라미터로 확인
+		        String productCode,
+		        String productName,
+		        String quantity,
+		        String status) throws SQLException { 
+
+		    String sql = "SELECT * FROM PRODUCTION_RESULT1 WHERE 1=1";
+
+		    if (resultId != null && !resultId.isBlank()) { //null&빈 문자열,공백 확인
+		        sql += " AND RESULT_ID = ?";
+		    }
+
+		    if (productCode != null && !productCode.isBlank()) {
+		        sql += " AND PRODUCT_CODE = ?";
+		    }
+
+		    if (productName != null && !productName.isBlank()) {
+		        sql += " AND PRODUCT_NAME = ?";
+		    }
+
+		    if (quantity != null && !quantity.isBlank()) {
+		        sql += " AND QUANTITY = ?";
+		    }
+
+		    if (status != null && !status.isBlank()) {
+		        sql += " AND STATUS = ?";
+		    }
+		    
+		    try (Connection conn = DBUtil.getConnection();
+		    	     PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+		    	    int index = 1; // PreparedStatement의 ? 위치 조건에 맞으면 1씩 증가하여 ?에 데이터 넣는다.
+
+		    	    if (resultId != null && !resultId.isBlank()) {
+		    	        pstmt.setInt(index++, Integer.parseInt(resultId));
+		    	    }
+
+		    	    if (productCode != null && !productCode.isBlank()) {
+		    	        pstmt.setString(index++, productCode);
+		    	    }
+
+		    	    if (productName != null && !productName.isBlank()) {
+		    	        pstmt.setString(index++, productName);
+		    	    }
+
+		    	    if (quantity != null && !quantity.isBlank()) {
+		    	        pstmt.setInt(index++, Integer.parseInt(quantity));
+		    	    }
+
+		    	    if (status != null && !status.isBlank()) {
+		    	        pstmt.setString(index++, status);
+		    	    }
+
+		    	    List<ProductionVO> list = new ArrayList<>();
+
+		    	    try (ResultSet rs = pstmt.executeQuery()) {
+
+		    	        while (rs.next()) {
+
+		    	            ProductionVO vo = new ProductionVO();
+
+		    	            vo.setResultId(rs.getInt("RESULT_ID"));
+		    	            vo.setProductCode(rs.getString("PRODUCT_CODE"));
+		    	            vo.setProductName(rs.getString("PRODUCT_NAME"));
+		    	            vo.setQuantity(rs.getInt("QUANTITY"));
+		    	            vo.setStatus(rs.getString("STATUS"));
+
+		    	            list.add(vo);
+		    	        }
+
+		    	        return list;
+		    	    }
+		    	}
+		}
 }
